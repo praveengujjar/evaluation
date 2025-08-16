@@ -225,10 +225,25 @@
     <div class="container">
         <header>
             <h1>First Draft BSchool Faculty Recruitment AI Evaluator</h1>
-                   </header>
+            
+        </header>
 
         <div class="card">
             <div class="grid">
+                <!-- New Faculty Name and Place Fields -->
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="faculty-name">Faculty Name</label>
+                        <input type="text" id="faculty-name" placeholder=" ">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="faculty-place">Place of Faculty</label>
+                        <input type="text" id="faculty-place" placeholder="e.g., Mumbai, India">
+                    </div>
+                </div>
+
                 <div class="col-6">
                     <div class="form-group">
                         <label for="post">Post Applied For</label>
@@ -409,6 +424,8 @@
             showError("err-ug", false);
 
             // Get values
+            const facultyName = txt("faculty-name");
+            const facultyPlace = txt("faculty-place");
             const post = txt("post");
             const age = num("age");
             const salary = num("salary");
@@ -481,13 +498,14 @@
             const res = document.getElementById("initial");
             res.style.display = "block";
             res.className = "result " + level;
-            res.textContent = `Initial Recommendation: Level ${level}`;
+            res.textContent = `Initial Recommendation for ${facultyName || "Candidate"}${facultyPlace ? " (" + facultyPlace + ")" : ""}: Level ${level}`;
         });
 
         // Final evaluation
         document.getElementById("btn-final").addEventListener("click", () => {
             const demo = num("demo");
             const interview = num("interview");
+            const facultyName = txt("faculty-name");
 
             const initialText = document.getElementById("initial").textContent || "";
             const match = initialText.match(/Level\s([ABC])/);
@@ -507,7 +525,7 @@
             const res = document.getElementById("final");
             res.style.display = "block";
             res.className = "result " + finalLevel;
-            res.textContent = `Final Recommendation: Level ${finalLevel} (Demo: ${demo || 0}/10, Interview: ${interview || 0}/10)`;
+            res.textContent = `Final Recommendation for ${facultyName || "Candidate"}: Level ${finalLevel} (Demo: ${demo || 0}/10, Interview: ${interview || 0}/10)`;
         });
     </script>
 </body>
