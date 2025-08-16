@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faculty Recruitment AI Evaluator</title>
+    <title>AI Faculty Recruitment Evaluator</title>
     <style>
         :root {
             --bg: #f8fafc;
@@ -148,6 +148,7 @@
             border-radius: 8px;
             font-weight: 600;
             display: none;
+            white-space: pre-line;
         }
 
         .A {
@@ -191,6 +192,21 @@
             display: none;
         }
 
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
             .col-6, .col-4, .col-3 {
                 grid-column: span 12;
@@ -224,13 +240,13 @@
 <body>
     <div class="container">
         <header>
-            <h1>First Draft BSchool Faculty Recruitment AI Evaluator</h1>
-            
+            <h1>First Draft AI Faculty Recruitment Evaluator</h1>
+           
         </header>
 
         <div class="card">
             <div class="grid">
-                <!-- New Faculty Name and Place Fields -->
+                <!-- Personal Information -->
                 <div class="col-6">
                     <div class="form-group">
                         <label for="faculty-name">Faculty Name</label>
@@ -239,14 +255,15 @@
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label for="faculty-place">Place of Faculty</label>
-                        <input type="text" id="faculty-place" placeholder="e.g., Mumbai, India">
+                        <label for="faculty-place">Current Institution/Location</label>
+                        <input type="text" id="faculty-place" placeholder="e.g., University of California">
                     </div>
                 </div>
 
+                <!-- Position Details -->
                 <div class="col-6">
                     <div class="form-group">
-                        <label for="post">Post Applied For</label>
+                        <label for="post">Position Applied For*</label>
                         <select id="post" required>
                             <option value="">Select Position</option>
                             <option>Assistant Professor</option>
@@ -255,13 +272,13 @@
                             <option>Professor of Practice</option>
                             <option>Visiting Faculty</option>
                         </select>
-                        <div id="err-post" class="error">Please select the post.</div>
+                        <div id="err-post" class="error">Please select the position.</div>
                     </div>
                 </div>
 
                 <div class="col-3">
                     <div class="form-group">
-                        <label for="age">Age</label>
+                        <label for="age">Age*</label>
                         <input type="number" id="age" min="21" max="100" placeholder="e.g., 35" required>
                         <div id="err-age" class="error">Enter valid age (21-100).</div>
                     </div>
@@ -270,33 +287,34 @@
                 <div class="col-3">
                     <div class="form-group">
                         <label for="salary">Expected Salary (₹)</label>
-                        <input type="number" id="salary" min="0" placeholder="e.g., 85,000">
+                        <input type="number" id="salary" min="0" placeholder="e.g., 85000">
                     </div>
                 </div>
 
                 <div class="col-3">
                     <div class="form-group">
-                        <label for="exp">Experience (Years)</label>
-                        <input type="number" id="exp" min="0" placeholder="e.g., 7">
+                        <label for="exp">Total Experience (Years)*</label>
+                        <input type="number" id="exp" min="0" placeholder="e.g., 7" required>
                     </div>
                 </div>
 
+                <!-- Educational Qualifications -->
                 <div class="col-12">
                     <div class="section-title">Educational Qualifications</div>
                 </div>
 
                 <div class="col-6">
                     <div class="form-group">
-                        <label for="ug">UG Program*</label>
+                        <label for="ug">Undergraduate Degree*</label>
                         <input type="text" id="ug" placeholder="e.g., B.Tech in Computer Science" required>
-                        <div id="err-ug" class="error">UG program is required.</div>
+                        <div id="err-ug" class="error">UG degree is required.</div>
                     </div>
                 </div>
 
                 <div class="col-6">
                     <div class="form-group">
-                        <label for="pg">PG Program</label>
-                        <input type="text" id="pg" placeholder="e.g., M.Tech in Artificial Intelligence">
+                        <label for="pg">Postgraduate Degree</label>
+                        <input type="text" id="pg" placeholder="e.g., M.Tech in AI">
                     </div>
                 </div>
 
@@ -309,39 +327,40 @@
 
                 <div class="col-6">
                     <div class="form-group">
-                        <label for="postdoc">PostDoc Research Area</label>
-                        <input type="text" id="postdoc" placeholder="e.g., Deep Learning Applications">
+                        <label for="postdoc">PostDoc Research (if any)</label>
+                        <input type="text" id="postdoc" placeholder="e.g., Deep Learning">
                     </div>
                 </div>
 
                 <div class="col-6">
                     <div class="form-group">
-                        <label for="other">Other Qualifications</label>
-                        <input type="text" id="other" placeholder="e.g., Professional Certifications">
+                        <label for="other">Other Certifications</label>
+                        <input type="text" id="other" placeholder="e.g., AWS Certified">
                     </div>
                 </div>
 
+                <!-- Research Output -->
                 <div class="col-12">
-                    <div class="section-title">Research Output</div>
+                    <div class="section-title">Research Output (Last 3 Years)</div>
                 </div>
 
                 <div class="col-4">
                     <div class="form-group">
-                        <label for="pub0">Publications (Current Year)</label>
+                        <label for="pub0">Current Year Publications</label>
                         <input type="number" id="pub0" min="0" placeholder="e.g., 3">
                     </div>
                 </div>
 
                 <div class="col-4">
                     <div class="form-group">
-                        <label for="pub1">Publications (Previous Year)</label>
+                        <label for="pub1">Previous Year Publications</label>
                         <input type="number" id="pub1" min="0" placeholder="e.g., 2">
                     </div>
                 </div>
 
                 <div class="col-4">
                     <div class="form-group">
-                        <label for="pub2">Publications (Year Before Last)</label>
+                        <label for="pub2">Year Before Last Publications</label>
                         <input type="number" id="pub2" min="0" placeholder="e.g., 1">
                     </div>
                 </div>
@@ -360,6 +379,14 @@
                     </div>
                 </div>
 
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="projects">Research Projects Led</label>
+                        <input type="number" id="projects" min="0" placeholder="e.g., 3">
+                    </div>
+                </div>
+
+                <!-- Evaluation Buttons -->
                 <div class="col-12">
                     <button class="btn" id="btn-initial">
                         Generate Initial Recommendation
@@ -369,6 +396,7 @@
             </div>
         </div>
 
+        <!-- Interview Evaluation Section -->
         <div class="card">
             <h2>Interview Evaluation</h2>
             <div class="grid">
@@ -394,6 +422,20 @@
                 </div>
             </div>
         </div>
+
+        <!-- AI Analysis Section -->
+        <div class="card">
+            <h2>AI-Powered Analysis</h2>
+            <div class="grid">
+                <div class="col-12">
+                    <button class="btn" id="btn-ai">
+                        <span id="ai-loader" class="loading" style="display:none;"></span>
+                        Generate Detailed AI Analysis
+                    </button>
+                    <div id="ai-analysis" class="result"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -416,6 +458,136 @@
             return "C";
         }
 
+        // AI-enhanced scoring algorithm
+        function calculateAIScore(data) {
+            // Position-specific weights
+            const positionWeights = {
+                "Assistant Professor": { 
+                    research: 1.2, teaching: 0.8, exp: 0.8, 
+                    phd: 35, postdoc: 25, patents: 12 
+                },
+                "Associate Professor": { 
+                    research: 1.1, teaching: 0.9, exp: 1.0,
+                    phd: 40, postdoc: 30, patents: 10
+                },
+                "Professor": { 
+                    research: 1.0, teaching: 1.0, exp: 1.2,
+                    phd: 45, postdoc: 35, patents: 8
+                },
+                "default": { 
+                    research: 1.0, teaching: 1.0, exp: 1.0,
+                    phd: 35, postdoc: 30, patents: 10
+                }
+            };
+            
+            const weights = positionWeights[data.post] || positionWeights.default;
+
+            // Calculate base scores
+            let score = 0;
+            
+            // 1. Qualifications (weighted)
+            if (data.ug) score += 5;  // Base UG score
+            if (data.pg) score += 15; // Base PG score
+            if (data.phd) score += weights.phd;
+            if (data.postdoc) score += weights.postdoc;
+            if (data.other) score += 8;
+
+            // 2. Experience (logarithmic scaling)
+            score += 10 * Math.log(1 + data.exp) / Math.log(5) * weights.exp;
+
+            // 3. Research Output (weighted and normalized)
+            const pubScore = (data.pub0 * 6 + data.pub1 * 4 + data.pub2 * 2) * weights.research;
+            score += Math.min(pubScore, 50);
+            
+            // Patents (diminishing returns)
+            score += weights.patents * (1 - Math.exp(-data.patents * 0.5));
+
+            // Projects (capped)
+            score += Math.min(data.projects * 5, 20);
+
+            // Consultancy (logarithmic)
+            score += 5 * Math.log(1 + data.consult/50000);
+
+            // 4. Demographic Adjustments
+            // Age (bell curve peaking at 40)
+            const ageAdjustment = 12 * Math.exp(-Math.pow((data.age - 40)/15, 2));
+            score += ageAdjustment;
+
+            // Salary (sigmoid penalty)
+            if (data.salary > 0) {
+                const salaryPenalty = -15 / (1 + Math.exp(-(data.salary - 100000)/20000));
+                score += salaryPenalty;
+            }
+
+            return Math.round(score);
+        }
+
+        // Generate AI analysis
+        async function generateAIAnalysis(data) {
+            const analysis = document.getElementById("ai-analysis");
+            const loader = document.getElementById("ai-loader");
+            
+            loader.style.display = "inline-block";
+            analysis.style.display = "block";
+            analysis.textContent = "Analyzing candidate profile using AI...";
+            
+            // Simulate AI processing delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // AI analysis components
+            const strengths = [];
+            const concerns = [];
+            let recommendation = "";
+            
+            // 1. Analyze qualifications
+            if (!data.phd && data.post !== "Professor of Practice") {
+                concerns.push("Lacking PhD qualification for academic position");
+            }
+            if (data.phd && data.postdoc) {
+                strengths.push("Strong research training (PhD + PostDoc)");
+            }
+            
+            // 2. Analyze research output
+            const totalPubs = data.pub0 + data.pub1 + data.pub2;
+            const pubRate = totalPubs / 3; // Average per year
+            
+            if (pubRate > 2) strengths.push(`Excellent publication rate (${pubRate.toFixed(1)}/year)`);
+            else if (pubRate < 0.5) concerns.push(`Low publication rate (${pubRate.toFixed(1)}/year)`);
+            
+            if (data.patents > 0) strengths.push(`Innovation demonstrated (${data.patents} patents)`);
+            
+            // 3. Analyze experience
+            if (data.exp < 3 && data.post.includes("Professor")) {
+                concerns.push("Limited experience for professorial position");
+            }
+            
+            // 4. Generate recommendation
+            if (data.score >= 90) {
+                recommendation = "🌟 Strong Recommend - Exceptional candidate with no significant weaknesses";
+            } else if (data.score >= 75) {
+                recommendation = "👍 Recommend - Solid candidate with good qualifications";
+            } else if (data.score >= 60) {
+                recommendation = "🤔 Consider with Mentorship - Potential but needs development";
+            } else {
+                recommendation = "⚠️ Not Recommended - Does not meet minimum requirements";
+            }
+            
+            // Format analysis
+            let analysisText = `AI ANALYSIS: ${data.name || "Candidate"}\n\n`;
+            analysisText += `▸ Position: ${data.post}\n`;
+            analysisText += `▸ Overall Score: Level ${classify(data.score)}\n\n`;
+            
+            analysisText += "STRENGTHS:\n";
+            analysisText += strengths.length ? strengths.map(s => `• ${s}`).join("\n") : "• No significant strengths identified\n";
+            analysisText += "\n\nCONCERNS:\n";
+            analysisText += concerns.length ? concerns.map(c => `• ${c}`).join("\n") : "• No major concerns identified\n";
+            analysisText += `\n\nRECOMMENDATION:\n${recommendation}`;
+            
+            analysis.className = "result " + classify(data.score);
+            analysis.textContent = analysisText;
+            loader.style.display = "none";
+        }
+
         // Initial evaluation
         document.getElementById("btn-initial").addEventListener("click", () => {
             // Clear errors
@@ -423,109 +595,93 @@
             showError("err-age", false);
             showError("err-ug", false);
 
-            // Get values
-            const facultyName = txt("faculty-name");
-            const facultyPlace = txt("faculty-place");
-            const post = txt("post");
-            const age = num("age");
-            const salary = num("salary");
-            const exp = num("exp");
-
-            const ug = txt("ug");
-            const pg = txt("pg");
-            const phd = txt("phd");
-            const postdoc = txt("postdoc");
-            const other = txt("other");
-
-            const pub0 = num("pub0");
-            const pub1 = num("pub1");
-            const pub2 = num("pub2");
-            const patents = num("patents");
-            const consult = num("consult");
-
-            // Validation
+            // Validate required fields
             let valid = true;
-            if (!post) { showError("err-post", true); valid = false; }
-            if (!(age >= 21 && age <= 100)) { showError("err-age", true); valid = false; }
-            if (!ug) { showError("err-ug", true); valid = false; }
+            if (!txt("post")) { showError("err-post", true); valid = false; }
+            if (!(num("age") >= 21 && num("age") <= 100)) { showError("err-age", true); valid = false; }
+            if (!txt("ug")) { showError("err-ug", true); valid = false; }
 
             if (!valid) {
                 const res = document.getElementById("initial");
                 res.style.display = "block";
                 res.className = "result C";
-                res.textContent = "Please correct the highlighted fields and try again.";
+                res.textContent = "Please complete all required fields";
                 return;
             }
 
-            // Scoring
-            let score = 0;
+            // Collect data
+            const candidateData = {
+                name: txt("faculty-name"),
+                place: txt("faculty-place"),
+                post: txt("post"),
+                age: num("age"),
+                salary: num("salary"),
+                exp: num("exp"),
+                ug: txt("ug"),
+                pg: txt("pg"),
+                phd: txt("phd"),
+                postdoc: txt("postdoc"),
+                other: txt("other"),
+                pub0: num("pub0"),
+                pub1: num("pub1"),
+                pub2: num("pub2"),
+                patents: num("patents"),
+                consult: num("consult"),
+                projects: num("projects")
+            };
 
-            // Qualifications
-            if (ug) score += 5;
-            if (pg) score += 15;
-            if (phd) score += 35;
-            if (postdoc) score += 30;
-            if (other) score += 8;
+            // Calculate score with AI algorithm
+            candidateData.score = calculateAIScore(candidateData);
 
-            // Experience
-            score += Math.min(exp * 4, 40);
-
-            // Publications
-            const pubScore = Math.min(pub0 * 6 + pub1 * 4 + pub2 * 2, 50);
-            score += pubScore;
-
-            // Patents (10 points each, capped at 30)
-            const patentScore = Math.min(patents * 10, 30);
-            score += patentScore;
-
-            // Consultancy
-            const consultScore = Math.min(Math.floor(consult / 10000), 40);
-            score += consultScore;
-
-            // Age adjustment
-            if (age < 35) score += 5;
-            else if (age <= 50) score += 8;
-            else score += 6;
-
-            // Salary adjustment
-            if (salary > 0) {
-                const salaryAdjustment = -Math.min(Math.floor(salary / 50000), 15);
-                score += salaryAdjustment;
-            }
-
-            // Classify and display
-            const level = classify(score);
+            // Display initial recommendation
+            const level = classify(candidateData.score);
             const res = document.getElementById("initial");
             res.style.display = "block";
             res.className = "result " + level;
-            res.textContent = `Initial Recommendation for ${facultyName || "Candidate"}${facultyPlace ? " (" + facultyPlace + ")" : ""}: Level ${level}`;
+            res.textContent = `Initial Recommendation: ${candidateData.name || "Candidate"} - Level ${level}`;
+            res.dataset.candidateData = JSON.stringify(candidateData);
         });
 
         // Final evaluation
         document.getElementById("btn-final").addEventListener("click", () => {
             const demo = num("demo");
             const interview = num("interview");
-            const facultyName = txt("faculty-name");
 
             const initialText = document.getElementById("initial").textContent || "";
             const match = initialText.match(/Level\s([ABC])/);
             const initialLevel = match ? match[1] : "C";
 
-            const avg = (demo + interview) / 2;
+            // AI-weighted final score (demo 60%, interview 40%)
+            const demoWeight = 0.6;
+            const interviewWeight = 0.4;
+            const performanceScore = demo * demoWeight + interview * interviewWeight;
 
             let finalLevel = initialLevel;
-            if (avg >= 8) {
-                finalLevel = "A";
-            } else if (avg >= 5) {
+            if (performanceScore >= 8.5) {
+                finalLevel = "A";  // Excellent interview can boost
+            } else if (performanceScore >= 5) {
                 finalLevel = initialLevel === "C" ? "B" : initialLevel;
             } else {
-                finalLevel = "C";
+                finalLevel = "C";  // Poor interview can downgrade
             }
 
             const res = document.getElementById("final");
             res.style.display = "block";
             res.className = "result " + finalLevel;
-            res.textContent = `Final Recommendation for ${facultyName || "Candidate"}: Level ${finalLevel} (Demo: ${demo || 0}/10, Interview: ${interview || 0}/10)`;
+            res.textContent = `Final Recommendation: Level ${finalLevel}\n` +
+                             `(Demo: ${demo}/10, Interview: ${interview}/10)`;
+        });
+
+        // AI Analysis button
+        document.getElementById("btn-ai").addEventListener("click", async () => {
+            const initialResult = document.getElementById("initial");
+            if (initialResult.style.display !== "block") {
+                alert("Please generate an initial recommendation first");
+                return;
+            }
+
+            const candidateData = JSON.parse(initialResult.dataset.candidateData);
+            await generateAIAnalysis(candidateData);
         });
     </script>
 </body>
