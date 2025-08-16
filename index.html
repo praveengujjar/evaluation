@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Recruitment AI Evaluator</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+            --transition: all 0.2s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+            color: var(--text);
+        }
+
+        .grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(12, 1fr);
+        }
+
+        .col-12 { grid-column: span 12; }
+        .col-6 { grid-column: span 6; }
+        .col-4 { grid-column: span 4; }
+        .col-3 { grid-column: span 3; }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background-color: white;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.875rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 1.25rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .A {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .B {
+            background-color: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .C {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .section-title {
+            color: var(--muted);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1rem 0 0.5rem;
+            font-weight: 600;
+        }
+
+        .note {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .error {
+            color: var(--danger);
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .col-6, .col-4, .col-3 {
+                grid-column: span 12;
+            }
+            
+            .card {
+                padding: 1.25rem;
+            }
+            
+            h1 {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>First Draft BSchool Faculty Recruitment AI Evaluator</h1>
+                   </header>
+
+        <div class="card">
+            <div class="grid">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="post">Post Applied For</label>
+                        <select id="post" required>
+                            <option value="">Select Position</option>
+                            <option>Assistant Professor</option>
+                            <option>Associate Professor</option>
+                            <option>Professor</option>
+                            <option>Professor of Practice</option>
+                            <option>Visiting Faculty</option>
+                        </select>
+                        <div id="err-post" class="error">Please select the post.</div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" min="21" max="100" placeholder="e.g., 35" required>
+                        <div id="err-age" class="error">Enter valid age (21-100).</div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="salary">Expected Salary (₹)</label>
+                        <input type="number" id="salary" min="0" placeholder="e.g., 85,000">
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="exp">Experience (Years)</label>
+                        <input type="number" id="exp" min="0" placeholder="e.g., 7">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="section-title">Educational Qualifications</div>
+                </div>
+
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="ug">UG Program*</label>
+                        <input type="text" id="ug" placeholder="e.g., B.Tech in Computer Science" required>
+                        <div id="err-ug" class="error">UG program is required.</div>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="pg">PG Program</label>
+                        <input type="text" id="pg" placeholder="e.g., M.Tech in Artificial Intelligence">
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="phd">Ph.D. Research Area</label>
+                        <input type="text" id="phd" placeholder="e.g., Machine Learning">
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="postdoc">PostDoc Research Area</label>
+                        <input type="text" id="postdoc" placeholder="e.g., Deep Learning Applications">
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="other">Other Qualifications</label>
+                        <input type="text" id="other" placeholder="e.g., Professional Certifications">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="section-title">Research Output</div>
+                </div>
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="pub0">Publications (Current Year)</label>
+                        <input type="number" id="pub0" min="0" placeholder="e.g., 3">
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="pub1">Publications (Previous Year)</label>
+                        <input type="number" id="pub1" min="0" placeholder="e.g., 2">
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="pub2">Publications (Year Before Last)</label>
+                        <input type="number" id="pub2" min="0" placeholder="e.g., 1">
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="patents">Patents Filed/Granted</label>
+                        <input type="number" id="patents" min="0" placeholder="e.g., 2">
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="consult">Consultancy Revenue (₹)</label>
+                        <input type="number" id="consult" min="0" placeholder="e.g., 250000">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <button class="btn" id="btn-initial">
+                        Generate Initial Recommendation
+                    </button>
+                    <div id="initial" class="result"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Interview Evaluation</h2>
+            <div class="grid">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="demo">Demo Class Rating (1-10)</label>
+                        <input type="number" id="demo" min="1" max="10" placeholder="e.g., 8">
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="interview">Interview Rating (1-10)</label>
+                        <input type="number" id="interview" min="1" max="10" placeholder="e.g., 7">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <button class="btn" id="btn-final">
+                        Calculate Final Recommendation
+                    </button>
+                    <div id="final" class="result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Helper functions
+        const num = (id) => {
+            const v = parseFloat(document.getElementById(id).value);
+            return Number.isFinite(v) ? v : 0;
+        };
+
+        const txt = (id) => (document.getElementById(id).value || "").trim();
+
+        function showError(id, show) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = show ? "block" : "none";
+        }
+
+        function classify(score) {
+            if (score >= 90) return "A";
+            if (score >= 60) return "B";
+            return "C";
+        }
+
+        // Initial evaluation
+        document.getElementById("btn-initial").addEventListener("click", () => {
+            // Clear errors
+            showError("err-post", false);
+            showError("err-age", false);
+            showError("err-ug", false);
+
+            // Get values
+            const post = txt("post");
+            const age = num("age");
+            const salary = num("salary");
+            const exp = num("exp");
+
+            const ug = txt("ug");
+            const pg = txt("pg");
+            const phd = txt("phd");
+            const postdoc = txt("postdoc");
+            const other = txt("other");
+
+            const pub0 = num("pub0");
+            const pub1 = num("pub1");
+            const pub2 = num("pub2");
+            const patents = num("patents");
+            const consult = num("consult");
+
+            // Validation
+            let valid = true;
+            if (!post) { showError("err-post", true); valid = false; }
+            if (!(age >= 21 && age <= 100)) { showError("err-age", true); valid = false; }
+            if (!ug) { showError("err-ug", true); valid = false; }
+
+            if (!valid) {
+                const res = document.getElementById("initial");
+                res.style.display = "block";
+                res.className = "result C";
+                res.textContent = "Please correct the highlighted fields and try again.";
+                return;
+            }
+
+            // Scoring
+            let score = 0;
+
+            // Qualifications
+            if (ug) score += 5;
+            if (pg) score += 15;
+            if (phd) score += 35;
+            if (postdoc) score += 30;
+            if (other) score += 8;
+
+            // Experience
+            score += Math.min(exp * 4, 40);
+
+            // Publications
+            const pubScore = Math.min(pub0 * 6 + pub1 * 4 + pub2 * 2, 50);
+            score += pubScore;
+
+            // Patents (10 points each, capped at 30)
+            const patentScore = Math.min(patents * 10, 30);
+            score += patentScore;
+
+            // Consultancy
+            const consultScore = Math.min(Math.floor(consult / 10000), 40);
+            score += consultScore;
+
+            // Age adjustment
+            if (age < 35) score += 5;
+            else if (age <= 50) score += 8;
+            else score += 6;
+
+            // Salary adjustment
+            if (salary > 0) {
+                const salaryAdjustment = -Math.min(Math.floor(salary / 50000), 15);
+                score += salaryAdjustment;
+            }
+
+            // Classify and display
+            const level = classify(score);
+            const res = document.getElementById("initial");
+            res.style.display = "block";
+            res.className = "result " + level;
+            res.textContent = `Initial Recommendation: Level ${level}`;
+        });
+
+        // Final evaluation
+        document.getElementById("btn-final").addEventListener("click", () => {
+            const demo = num("demo");
+            const interview = num("interview");
+
+            const initialText = document.getElementById("initial").textContent || "";
+            const match = initialText.match(/Level\s([ABC])/);
+            const initialLevel = match ? match[1] : "C";
+
+            const avg = (demo + interview) / 2;
+
+            let finalLevel = initialLevel;
+            if (avg >= 8) {
+                finalLevel = "A";
+            } else if (avg >= 5) {
+                finalLevel = initialLevel === "C" ? "B" : initialLevel;
+            } else {
+                finalLevel = "C";
+            }
+
+            const res = document.getElementById("final");
+            res.style.display = "block";
+            res.className = "result " + finalLevel;
+            res.textContent = `Final Recommendation: Level ${finalLevel} (Demo: ${demo || 0}/10, Interview: ${interview || 0}/10)`;
+        });
+    </script>
+</body>
+</html>
