@@ -192,19 +192,15 @@
             display: none;
         }
 
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .toggle-label {
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
         }
 
         @media (max-width: 768px) {
@@ -241,7 +237,7 @@
     <div class="container">
         <header>
             <h1>First Draft AI Faculty Recruitment Evaluator</h1>
-           
+            
         </header>
 
         <div class="card">
@@ -253,10 +249,12 @@
                         <input type="text" id="faculty-name" placeholder=" ">
                     </div>
                 </div>
+                
                 <div class="col-6">
                     <div class="form-group">
-                        <label for="faculty-place">Place</label>
-                        <input type="text" id="faculty-place" placeholder="e.g., Bengaluru, India">
+                        <label for="current-university">Current University/Institution</label>
+                        <input type="text" id="current-university" placeholder="e.g., Stanford University">
+                        <div class="note">Leave blank if fresher</div>
                     </div>
                 </div>
 
@@ -279,22 +277,48 @@
                 <div class="col-3">
                     <div class="form-group">
                         <label for="age">Age*</label>
-                        <input type="number" id="age" min="21" max="100" placeholder="e.g., 35" required>
+                        <input type="number" id="age" min="21" max="100" placeholder="35" required>
                         <div id="err-age" class="error">Enter valid age (21-100).</div>
                     </div>
                 </div>
 
                 <div class="col-3">
                     <div class="form-group">
-                        <label for="salary">Expected Salary (₹)</label>
-                        <input type="number" id="salary" min="0" placeholder="e.g., 85000">
+                        <label for="exp">Experience (Years)*</label>
+                        <input type="number" id="exp" min="0" placeholder="7" required>
                     </div>
                 </div>
 
-                <div class="col-3">
+                <!-- Salary Information -->
+                <div class="col-12">
+                    <div class="section-title">Salary Details</div>
+                </div>
+
+                <div class="col-4">
                     <div class="form-group">
-                        <label for="exp">Total Experience (Years)*</label>
-                        <input type="number" id="exp" min="0" placeholder="e.g., 7" required>
+                        <label for="current-salary">Current Salary (₹/month)</label>
+                        <input type="number" id="current-salary" min="0" placeholder="e.g., 75000">
+                        <div class="note">Leave blank if fresher</div>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="expected-salary">Expected Salary (₹/month)*</label>
+                        <input type="number" id="expected-salary" min="0" placeholder="e.g., 90000" required>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="salary-justification">Salary Justification</label>
+                        <select id="salary-justification">
+                            <option value="">Select reason</option>
+                            <option>Market competitive</option>
+                            <option>Based on qualifications</option>
+                            <option>Higher than current</option>
+                            <option>Other reasons</option>
+                        </select>
                     </div>
                 </div>
 
@@ -386,10 +410,36 @@
                     </div>
                 </div>
 
+                <!-- Teaching Experience -->
+                <div class="col-12">
+                    <div class="section-title">Teaching Experience</div>
+                </div>
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="courses-taught">Courses Taught</label>
+                        <input type="number" id="courses-taught" min="0" placeholder="e.g., 5">
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="student-feedback">Student Feedback (1-10)</label>
+                        <input type="number" id="student-feedback" min="1" max="10" placeholder="e.g., 8">
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="teaching-awards">Teaching Awards</label>
+                        <input type="number" id="teaching-awards" min="0" placeholder="e.g., 2">
+                    </div>
+                </div>
+
                 <!-- Evaluation Buttons -->
                 <div class="col-12">
                     <button class="btn" id="btn-initial">
-                        Generate Initial Recommendation
+                        Generate Recommendation
                     </button>
                     <div id="initial" class="result"></div>
                 </div>
@@ -429,7 +479,6 @@
             <div class="grid">
                 <div class="col-12">
                     <button class="btn" id="btn-ai">
-                        <span id="ai-loader" class="loading" style="display:none;"></span>
                         Generate Detailed AI Analysis
                     </button>
                     <div id="ai-analysis" class="result"></div>
@@ -458,134 +507,166 @@
             return "C";
         }
 
-        // AI-enhanced scoring algorithm
-        function calculateAIScore(data) {
-            // Position-specific weights
-            const positionWeights = {
-                "Assistant Professor": { 
-                    research: 1.2, teaching: 0.8, exp: 0.8, 
-                    phd: 35, postdoc: 25, patents: 12 
-                },
-                "Associate Professor": { 
-                    research: 1.1, teaching: 0.9, exp: 1.0,
-                    phd: 40, postdoc: 30, patents: 10
-                },
-                "Professor": { 
-                    research: 1.0, teaching: 1.0, exp: 1.2,
-                    phd: 45, postdoc: 35, patents: 8
-                },
-                "default": { 
-                    research: 1.0, teaching: 1.0, exp: 1.0,
-                    phd: 35, postdoc: 30, patents: 10
-                }
+        // Realistic salary evaluation
+        function evaluateSalary(current, expected, position, experience) {
+            // Position-based salary benchmarks (monthly in ₹)
+            const benchmarks = {
+                "Assistant Professor": { min: 60000, avg: 85000, max: 120000 },
+                "Associate Professor": { min: 90000, avg: 120000, max: 180000 },
+                "Professor": { min: 120000, avg: 160000, max: 250000 },
+                "Professor of Practice": { min: 100000, avg: 150000, max: 300000 },
+                "Visiting Faculty": { min: 50000, avg: 80000, max: 150000 },
+                "default": { min: 50000, avg: 75000, max: 150000 }
             };
             
-            const weights = positionWeights[data.post] || positionWeights.default;
-
-            // Calculate base scores
+            const range = benchmarks[position] || benchmarks.default;
+            
+            // Calculate salary score (0-100)
             let score = 0;
             
-            // 1. Qualifications (weighted)
-            if (data.ug) score += 5;  // Base UG score
-            if (data.pg) score += 15; // Base PG score
-            if (data.phd) score += weights.phd;
-            if (data.postdoc) score += weights.postdoc;
-            if (data.other) score += 8;
-
-            // 2. Experience (logarithmic scaling)
-            score += 10 * Math.log(1 + data.exp) / Math.log(5) * weights.exp;
-
-            // 3. Research Output (weighted and normalized)
-            const pubScore = (data.pub0 * 6 + data.pub1 * 4 + data.pub2 * 2) * weights.research;
-            score += Math.min(pubScore, 50);
-            
-            // Patents (diminishing returns)
-            score += weights.patents * (1 - Math.exp(-data.patents * 0.5));
-
-            // Projects (capped)
-            score += Math.min(data.projects * 5, 20);
-
-            // Consultancy (logarithmic)
-            score += 5 * Math.log(1 + data.consult/50000);
-
-            // 4. Demographic Adjustments
-            // Age (bell curve peaking at 40)
-            const ageAdjustment = 12 * Math.exp(-Math.pow((data.age - 40)/15, 2));
-            score += ageAdjustment;
-
-            // Salary (sigmoid penalty)
-            if (data.salary > 0) {
-                const salaryPenalty = -15 / (1 + Math.exp(-(data.salary - 100000)/20000));
-                score += salaryPenalty;
+            // 1. Check if within reasonable range
+            if (expected >= range.min && expected <= range.max) {
+                score = 80; // Base score for being in range
+                
+                // 2. Compare to current salary (if available)
+                if (current > 0) {
+                    const increase = ((expected - current) / current) * 100;
+                    if (increase <= 30) score += 10; // Reasonable increase
+                    else if (increase <= 50) score += 5; // Moderate increase
+                    else score -= 10; // Large increase
+                }
+                
+                // 3. Experience adjustment
+                if (experience >= 5) score += 5;
+                else if (experience <= 2) score -= 5;
+            } 
+            else if (expected < range.min) {
+                score = 60 + (expected/range.min * 20); // 60-80 for below range
+            } 
+            else {
+                score = 80 - ((expected - range.max)/range.max * 30); // Penalize for above range
             }
+            
+            return Math.max(0, Math.min(100, Math.round(score)));
+        }
 
+        // University prestige scoring
+        function evaluateUniversity(universityName) {
+            if (!universityName) return 0;
+            
+            // Tier 1 institutions (global top 100 or national top 10)
+            const tier1 = ["harvard", "stanford", "mit", "oxford", "cambridge", 
+                          "iit", "iisc", "iim", "princeton", "caltech"];
+            
+            // Tier 2 institutions (well-recognized national/regional)
+            const tier2 = ["duke", "northwestern", "johns hopkins", "university of london",
+                          "university of toronto", "anu", "university of melbourne"];
+            
+            const lowerName = universityName.toLowerCase();
+            
+            if (tier1.some(uni => lowerName.includes(uni))) return 10;
+            if (tier2.some(uni => lowerName.includes(uni))) return 5;
+            return 0;
+        }
+
+        // Main scoring function
+        function calculateScore(data) {
+            let score = 0;
+            
+            // 1. Qualifications (35%)
+            if (data.ug) score += 5;
+            if (data.pg) score += 10;
+            if (data.phd) score += 25;
+            if (data.postdoc) score += 15;
+            if (data.other) score += 5;
+            
+            // 2. Research Output (30%)
+            const pubScore = Math.min(data.pub0 * 6 + data.pub1 * 4 + data.pub2 * 2, 50);
+            score += pubScore;
+            score += Math.min(data.patents * 5, 20);
+            score += Math.min(data.projects * 3, 15);
+            score += Math.min(Math.floor(data.consult / 100000), 10);
+            
+            // 3. Teaching Experience (15%)
+            score += Math.min(data.coursesTaught * 2, 10);
+            score += Math.min(data.studentFeedback * 2, 10);
+            score += Math.min(data.teachingAwards * 5, 10);
+            
+            // 4. University Prestige (5%)
+            score += evaluateUniversity(data.university);
+            
+            // 5. Salary Evaluation (15%)
+            const salaryScore = evaluateSalary(
+                data.currentSalary,
+                data.expectedSalary,
+                data.post,
+                data.exp
+            );
+            score += salaryScore * 0.15;
+            
+            // 6. Age adjustment (small factor)
+            if (data.age < 35) score += 5;
+            else if (data.age <= 50) score += 3;
+            
             return Math.round(score);
         }
 
         // Generate AI analysis
         async function generateAIAnalysis(data) {
             const analysis = document.getElementById("ai-analysis");
-            const loader = document.getElementById("ai-loader");
-            
-            loader.style.display = "inline-block";
             analysis.style.display = "block";
-            analysis.textContent = "Analyzing candidate profile using AI...";
+            analysis.textContent = "Analyzing candidate profile...";
             
             // Simulate AI processing delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 1500));
             
-            // AI analysis components
+            // AI-generated insights
             const strengths = [];
-            const concerns = [];
-            let recommendation = "";
+            const weaknesses = [];
             
-            // 1. Analyze qualifications
-            if (!data.phd && data.post !== "Professor of Practice") {
-                concerns.push("Lacking PhD qualification for academic position");
-            }
-            if (data.phd && data.postdoc) {
-                strengths.push("Strong research training (PhD + PostDoc)");
-            }
+            // Analyze qualifications
+            if (data.phd) strengths.push("Strong research background (PhD)");
+            if (data.postdoc) strengths.push("Postdoctoral experience adds depth");
+            if (!data.pg && data.post !== "Professor of Practice") 
+                weaknesses.push("Lacking postgraduate qualification");
             
-            // 2. Analyze research output
+            // Analyze research output
             const totalPubs = data.pub0 + data.pub1 + data.pub2;
-            const pubRate = totalPubs / 3; // Average per year
+            if (totalPubs > 5) strengths.push(`Productive researcher (${totalPubs} publications)`);
+            if (totalPubs < 2 && data.post !== "Professor of Practice") 
+                weaknesses.push("Limited publication record");
             
-            if (pubRate > 2) strengths.push(`Excellent publication rate (${pubRate.toFixed(1)}/year)`);
-            else if (pubRate < 0.5) concerns.push(`Low publication rate (${pubRate.toFixed(1)}/year)`);
+            // Analyze teaching
+            if (data.teachingAwards > 0) strengths.push(`Teaching excellence (${data.teachingAwards} awards)`);
+            if (data.studentFeedback < 6) weaknesses.push(`Low student feedback (${data.studentFeedback}/10)`);
             
-            if (data.patents > 0) strengths.push(`Innovation demonstrated (${data.patents} patents)`);
+            // Analyze salary expectations
+            const salaryScore = evaluateSalary(
+                data.currentSalary,
+                data.expectedSalary,
+                data.post,
+                data.exp
+            );
+            if (salaryScore < 60) weaknesses.push("Salary expectations may be unrealistic");
+            else if (salaryScore > 80) strengths.push("Reasonable salary expectations");
             
-            // 3. Analyze experience
-            if (data.exp < 3 && data.post.includes("Professor")) {
-                concerns.push("Limited experience for professorial position");
+            // Analyze university
+            if (data.university) {
+                const uniScore = evaluateUniversity(data.university);
+                if (uniScore > 5) strengths.push(`Prestigious institution (${data.university})`);
             }
             
-            // 4. Generate recommendation
-            if (data.score >= 90) {
-                recommendation = "Strong Recommend - Exceptional candidate with no significant weaknesses";
-            } else if (data.score >= 75) {
-                recommendation = "Recommend - Solid candidate with good qualifications";
-            } else if (data.score >= 60) {
-                recommendation = " Consider with Mentorship - Potential but needs development";
-            } else {
-                recommendation = "Not Recommended - Does not meet minimum requirements";
-            }
-            
-            // Format analysis
+            // Generate analysis
             let analysisText = `AI ANALYSIS: ${data.name || "Candidate"}\n\n`;
-            analysisText += `▸ Position: ${data.post}\n`;
-            analysisText += `▸ Overall Score: Level ${classify(data.score)}\n\n`;
-            
-            analysisText += "STRENGTHS:\n";
-            analysisText += strengths.length ? strengths.map(s => `• ${s}`).join("\n") : "• No significant strengths identified\n";
-            analysisText += "\n\nCONCERNS:\n";
-            analysisText += concerns.length ? concerns.map(c => `• ${c}`).join("\n") : "• No major concerns identified\n";
-            analysisText += `\n\nRECOMMENDATION:\n${recommendation}`;
+            analysisText += "STRENGTHS:\n" + (strengths.length ? strengths.join("\n• ") : "No significant strengths identified") + "\n\n";
+            analysisText += "AREAS FOR IMPROVEMENT:\n" + (weaknesses.length ? weaknesses.join("\n• ") : "No major concerns found") + "\n\n";
+            analysisText += "RECOMMENDATION: " + 
+                (data.score >= 90 ? "Strongly Recommended" :
+                 data.score >= 60 ? "Recommended with Mentorship" :
+                 "Not Recommended at This Time");
             
             analysis.className = "result " + classify(data.score);
             analysis.textContent = analysisText;
-            loader.style.display = "none";
         }
 
         // Initial evaluation
@@ -600,6 +681,7 @@
             if (!txt("post")) { showError("err-post", true); valid = false; }
             if (!(num("age") >= 21 && num("age") <= 100)) { showError("err-age", true); valid = false; }
             if (!txt("ug")) { showError("err-ug", true); valid = false; }
+            if (!num("expected-salary")) { alert("Please enter expected salary"); valid = false; }
 
             if (!valid) {
                 const res = document.getElementById("initial");
@@ -612,11 +694,13 @@
             // Collect data
             const candidateData = {
                 name: txt("faculty-name"),
-                place: txt("faculty-place"),
+                university: txt("current-university"),
                 post: txt("post"),
                 age: num("age"),
-                salary: num("salary"),
                 exp: num("exp"),
+                currentSalary: num("current-salary"),
+                expectedSalary: num("expected-salary"),
+                salaryJustification: txt("salary-justification"),
                 ug: txt("ug"),
                 pg: txt("pg"),
                 phd: txt("phd"),
@@ -627,11 +711,14 @@
                 pub2: num("pub2"),
                 patents: num("patents"),
                 consult: num("consult"),
-                projects: num("projects")
+                projects: num("projects"),
+                coursesTaught: num("courses-taught"),
+                studentFeedback: num("student-feedback"),
+                teachingAwards: num("teaching-awards")
             };
 
-            // Calculate score with AI algorithm
-            candidateData.score = calculateAIScore(candidateData);
+            // Calculate score
+            candidateData.score = calculateScore(candidateData);
 
             // Display initial recommendation
             const level = classify(candidateData.score);
@@ -651,25 +738,23 @@
             const match = initialText.match(/Level\s([ABC])/);
             const initialLevel = match ? match[1] : "C";
 
-            // AI-weighted final score (demo 60%, interview 40%)
-            const demoWeight = 0.6;
-            const interviewWeight = 0.4;
-            const performanceScore = demo * demoWeight + interview * interviewWeight;
+            // Weighted average (60% demo, 40% interview)
+            const performanceScore = demo * 0.6 + interview * 0.4;
 
             let finalLevel = initialLevel;
-            if (performanceScore >= 8.5) {
-                finalLevel = "A";  // Excellent interview can boost
+            if (performanceScore >= 8) {
+                finalLevel = "A"; // Excellent performance can boost
             } else if (performanceScore >= 5) {
-                finalLevel = initialLevel === "C" ? "B" : initialLevel;
+                // Maintain or one level boost
+                if (initialLevel === "C") finalLevel = "B";
             } else {
-                finalLevel = "C";  // Poor interview can downgrade
+                finalLevel = "C"; // Poor performance can downgrade
             }
 
             const res = document.getElementById("final");
             res.style.display = "block";
             res.className = "result " + finalLevel;
-            res.textContent = `Final Recommendation: Level ${finalLevel}\n` +
-                             `(Demo: ${demo}/10, Interview: ${interview}/10)`;
+            res.textContent = `Final Recommendation: Level ${finalLevel}\n(Demo: ${demo}/10, Interview: ${interview}/10)`;
         });
 
         // AI Analysis button
@@ -686,5 +771,3 @@
     </script>
 </body>
 </html>
-
-
